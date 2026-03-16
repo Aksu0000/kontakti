@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, Button, FlatList } from "react-native";
 import * as Contacts from "expo-contacts";
-//import * as SMS from "expo-sms";
 
 export default function App() {
   const [contacts, setContacts] = useState([]);
@@ -10,12 +9,16 @@ export default function App() {
     const { status } = await Contacts.requestPermissionsAsync();
 
     if (status === "granted") {
-      const { data } = await Contacts.getContactsAsync({
-        fields: [Contacts.Fields.PhoneNumbers],
-      });
+      const { data } = await Contacts.getContactsAsync(
+        {fields: [Contacts.Fields.PhoneNumbers] }
+      );
 
       if (data.length > 0) {
         setContacts(data);
+      }
+
+      else {
+      Alert.alert("Warning", "No contacts found.");      
       }
     }
   };
@@ -26,10 +29,11 @@ export default function App() {
         data={contacts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
-          const phone =
-            item.phoneNumbers && item.phoneNumbers.length > 0
-              ? item.phoneNumbers[0].number
-              : "No phone number";
+          let phone = "No phone number";
+
+          if (item.phoneNumbers && item.phoneNumbers.length > 0) {
+            phone = item.phoneNumbers[0].number;
+          }
 
           return (
             <View style={styles.item}>
